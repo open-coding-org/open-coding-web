@@ -1,52 +1,23 @@
 import js from '@eslint/js'
+import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
-import simpleImportSort from 'eslint-plugin-simple-import-sort'
-import globals from 'globals'
-import neostandard, { resolveIgnoresFromGitignore } from 'neostandard'
 import tseslint from 'typescript-eslint'
+import { globalIgnores } from 'eslint/config'
 
-export default tseslint.config(
-  { ignores: ['dist'] },
-  ...neostandard({
-    ignores: resolveIgnoresFromGitignore()
-  }),
+export default tseslint.config([
+  globalIgnores(['dist']),
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
+    extends: [
+      js.configs.recommended,
+      tseslint.configs.recommended,
+      reactHooks.configs['recommended-latest'],
+      reactRefresh.configs.vite,
+    ],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser
+      globals: globals.browser,
     },
-    plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
-      'simple-import-sort': simpleImportSort
-    },
-    rules: {
-      ...reactHooks.configs.recommended.rules,
-      'simple-import-sort/imports': 'error',
-      'simple-import-sort/exports': 'error',
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-      '@stylistic/max-len': [
-        'warn',
-        {
-          code: 120,
-          tabWidth: 2,
-          ignoreUrls: true,
-          ignoreComments: false,
-          ignoreStrings: true
-        }
-      ],
-      '@stylistic/space-before-function-paren': [
-        'error',
-        {
-          anonymous: 'always',
-          asyncArrow: 'always',
-          named: 'never'
-        }
-      ],
-      '@stylistic/jsx-quotes': ['error', 'prefer-double']
-    }
-  }
-)
+  },
+])
